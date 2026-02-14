@@ -6,12 +6,13 @@ import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
 
+// Destructure to avoid "providers specified more than once" warning during spread
+const { providers: _, ...configWithoutProviders } = authConfig
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
+    ...configWithoutProviders,
     adapter: PrismaAdapter(prisma),
     session: { strategy: "jwt" },
-    trustHost: true,
-    secret: process.env.AUTH_SECRET,
-    ...authConfig,
     providers: [
         Credentials({
             async authorize(credentials) {

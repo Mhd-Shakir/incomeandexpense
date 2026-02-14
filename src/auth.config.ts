@@ -2,9 +2,7 @@ import type { NextAuthConfig } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 
 export default {
-    providers: [
-        Credentials({}),
-    ],
+    providers: [], // Keep it empty to satisfy type but avoid logic here
     trustHost: true,
     secret: process.env.AUTH_SECRET,
     pages: {
