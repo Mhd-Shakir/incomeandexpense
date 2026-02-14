@@ -3,10 +3,10 @@ import Credentials from "next-auth/providers/credentials"
 
 export default {
     providers: [
-        // We'll define the full credentials provider in auth.ts
-        // because it needs Prisma which isn't edge-compatible
         Credentials({}),
     ],
+    trustHost: true,
+    secret: process.env.AUTH_SECRET,
     pages: {
         signIn: "/login",
     },
