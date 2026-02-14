@@ -6,10 +6,14 @@ import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
 
+// Merge manually to ensure no duplicate keys or hidden conflicts
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
     session: { strategy: "jwt" },
-    ...authConfig,
+    pages: authConfig.pages,
+    callbacks: authConfig.callbacks,
+    trustHost: true,
+    secret: process.env.AUTH_SECRET,
     providers: [
         Credentials({
             async authorize(credentials) {
@@ -19,15 +23,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                 if (parsedCredentials.success) {
                     const { email, password } = parsedCredentials.data
-                    const user = await prisma.user.findUnique({ where: { email } })
 
-                    if (!user || !user.password) return null
+                    try {
+                        const user = await prisma.user.findUnique({ where: { email } })
+                        if (!user || !user.password) return null
 
-                    const passwordsMatch = await bcrypt.compare(password, user.password)
-
-                    if (passwordsMatch) return user
+                        const passwordsMatch = await bcrypt.compare(password, user.password)
+                        if (passwordsMatch) return user
+                    } catch (dbError) {
+                        console.error("Auth Database Error:", dbError)
+                        return null
+                    }
                 }
-
                 return null
             },
         }),
