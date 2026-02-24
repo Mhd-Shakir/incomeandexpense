@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials"
 
 export default {
     providers: [], // Keep it empty to satisfy type but avoid logic here
-    trustHost: true,
+    // trustHost: true,
     secret: process.env.AUTH_SECRET,
     pages: {
         signIn: "/login",
